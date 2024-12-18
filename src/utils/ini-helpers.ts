@@ -21,14 +21,16 @@ export function insertToIniObject(
   key: string,
   value: string
 ): Record<string, any> {
-  const sectionParts = section.split(".");
   let current = config;
 
-  for (const key of sectionParts) {
-    if (current[key] === undefined || typeof current[key] !== "object") {
-      current[key] = {};
+  for (const sectionFragment of section.split(".")) {
+    if (
+      current[sectionFragment] === undefined ||
+      typeof current[sectionFragment] !== "object"
+    ) {
+      current[sectionFragment] = {};
     }
-    current = current[key] as Record<string, any>;
+    current = current[sectionFragment] as Record<string, any>;
   }
   current[key] = value;
 
@@ -40,14 +42,16 @@ export function deleteFromIniObject(
   section: string,
   key: string
 ): Record<string, any> {
-  const sectionParts = section.split(".");
-
   let current = config;
-  for (const key of sectionParts) {
-    if (current[key] === undefined || typeof current[key] !== "object") {
+
+  for (const sectionFragment of section.split(".")) {
+    if (
+      current[sectionFragment] === undefined ||
+      typeof current[sectionFragment] !== "object"
+    ) {
       throw new Error("Section not found");
     }
-    current = current[key] as Record<string, any>;
+    current = current[sectionFragment] as Record<string, any>;
   }
   delete current[key];
 
