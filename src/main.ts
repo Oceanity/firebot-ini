@@ -5,7 +5,7 @@ import {
   logger,
   variableManager,
 } from "@oceanity/firebot-helpers/firebot";
-import { exists, ensureFile } from "fs-extra";
+import { ensureFile, exists } from "fs-extra";
 import {
   DEFAULT_INI_FILE_PATH,
   INI_INTEGRATION_AUTHOR,
@@ -14,12 +14,10 @@ import {
   INI_INTEGRATION_NAME,
   INI_INTEGRATION_VERSION,
 } from "./constants";
-import { AllIniReplaceVariables } from "./variables";
 import { AllIniEffectTypes } from "./effects";
+import { AllIniReplaceVariables } from "./variables";
 
-interface Params {
-  message: string;
-}
+interface Params {}
 
 const script: Firebot.CustomScript<Params> = {
   getScriptManifest: () => {
@@ -31,17 +29,7 @@ const script: Firebot.CustomScript<Params> = {
       firebotVersion: INI_INTEGRATION_FIREBOT_VERSION,
     };
   },
-  getDefaultParameters: () => {
-    return {
-      message: {
-        type: "string",
-        default: "Hello World!",
-        description: "Message",
-        secondaryDescription: "Enter a message here",
-        title: "Hello!",
-      },
-    };
-  },
+  getDefaultParameters: () => ({}),
   run: async (runRequest) => {
     initModules(runRequest.modules);
 
