@@ -1,31 +1,18 @@
 # Starter Firebot Custom Script in Typescript
 
 ### Setup
+1. Create a new repo based off this template (Click "Use this Template" above) or simply fork it
+2. `npm install`
 
-- In Firebot, go to Settings > Scripts
-  - Enable Custom Scripts if they are not currently enabled
-  - Click Manage Startup Scripts
-  - Click Add New Script
-  - Click the "scripts folder" link to open the Scripts Folder and place `oceanityIni.js` there
-  - Refresh the list of scripts and pick `oceanityIni.js` from the dropdown
+### Building
+Dev:
+1. `npm run build:dev`
+- Automatically copies the compiled .js to Firebot's scripts folder.
 
-### Updating
+Release:
+1. `npm run build`
+- Copy .js from `/dist`
 
-- Overwrite existing `oceanityIni.js` with new version
-- Restart Firebot
-
-### Features
-
-This script adds the following features to Firebot
-
-- **Effects**
-
-  - Write to INI File
-    - Adds or removes a value from either the built-in INI file the script creates (`firebot.ini` in the data folder) or a specified INI file
-
-- **Variables**
-
-  - $iniVariable[`path` (optional), `section`, `key`]
-    - Retrieves a value with the provided section and key from the provided INI file, or default if no path is provided
-    - eg. `$iniVariable[mySection, myKey]` will retrieve the value in [mySection] myKey from `firebot.ini`
-    - eg. `$iniVariable[C:/Users/Firebot/Documents/MyINI.ini, mySection, myKey]` will retrieve the value in [mySection] myKey from an INI file located at that path
+### Note
+- Keep the script definition object (that contains the `run`, `getScriptManifest`, and `getDefaultParameters` funcs) in the `main.ts` file as it's important those function names don't get minimized.
+- Edit the `"scriptOutputName"` property in `package.json` to change the filename of the outputted script.
