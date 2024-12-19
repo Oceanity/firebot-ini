@@ -6,13 +6,15 @@ import { writeFile } from "fs-extra";
 import { stringify } from "ini";
 import { DEFAULT_INI_FILE_PATH } from "../constants";
 import {
+  appendToIniObjectArray,
   deleteFromIniObject,
   insertToIniObject,
   readAndParseIniFile,
+  removeFromIniObjectArray,
 } from "../utils/ini-helpers";
 
 type WriteIniValueParams = {
-  editMode: "write" | "delete";
+  editMode: "write" | "delete" | "append" | "remove";
   filePathMode: "default" | "fileSelector" | "filePath";
   filePath?: string;
   key: string;
@@ -72,7 +74,7 @@ export const WriteIniValueEffectType: Firebot.EffectType<WriteIniValueParams> =
           menu-position="under"
           style="margin-bottom: 20px" />
         <firebot-input
-          ng-show="effect.editMode == 'write'"
+          ng-show="effect.editMode != 'delete'"
           model="effect.value"
           input-title="Value"
           placeholder-text="Value"
@@ -112,56 +114,66 @@ export const WriteIniValueEffectType: Firebot.EffectType<WriteIniValueParams> =
           description: "Delete a value from the INI file.",
           iconClass: "fa-eraser",
         },
+        {
+          value: "append",
+          label: "Append to Array",
+          description: "Append a value to an array in the INI file.",
+          iconClass: "fa-plus",
+        },
+        {
+          value: "remove",
+          label: "Remove from Array",
+          description: "Remove a value from an array in the INI file.",
+          iconClass: "fa-minus",
+        },
       ];
       if ($scope.effect.editMode === undefined) {
         $scope.effect.editMode = "write";
       }
     },
 
-    optionsValidator: () => {
-      return [];
+    optionsValidator: (effect) => {
+      const errors: string[] = [];
+      if (!effect.section) errors.push("Section is required.");
+      if (!effect.key) errors.push("Key is required.");
+      if (effect.editMode != "delete" && !effect.value)
+        errors.push("Value is required.");
+      return errors;
     },
 
     onTriggerEvent: async (event) => {
-      const { editMode, filePath, filePathMode, key, section, value } =
-        event.effect;
-
       try {
+        let { editMode, filePath, filePathMode, key, section, value } =
+          event.effect;
+
         const path =
           filePathMode === "default" ? DEFAULT_INI_FILE_PATH : filePath;
 
         if (!path) throw new Error("No file path provided.");
 
         let config = await readAndParseIniFile(path);
-        logger.info("Loaded config:\n", config);
+
+        const invalidKeyChars = new RegExp("[\\[\\]:=]", "ig");
+        if (key && invalidKeyChars.test(key))
+          key = key.replace(invalidKeyChars, "_");
 
         switch (editMode) {
           case "write":
-            try {
-              config = insertToIniObject(config, section, key, value);
-            } catch (error) {
-              logger.error(getErrorMessage(error), error);
-              return {
-                success: false,
-              };
-            }
+            config = insertToIniObject(config, section, key, value);
             break;
           case "delete":
-            try {
-              config = deleteFromIniObject(config, section, key);
-            } catch (error) {
-              logger.error(getErrorMessage(error), error);
-              return {
-                success: false,
-              };
-            }
+            config = deleteFromIniObject(config, section, key);
+            break;
+          case "append":
+            config = appendToIniObjectArray(config, section, key, value);
+            break;
+          case "remove":
+            config = removeFromIniObjectArray(config, section, key, value);
             break;
           default:
-            logger.error("Unknown editMode");
-            break;
+            throw new Error("Invalid edit mode.");
         }
 
-        logger.info("Updated config:\n", config);
         await writeFile(path, stringify(config));
 
         return {
