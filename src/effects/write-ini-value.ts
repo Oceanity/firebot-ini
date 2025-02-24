@@ -2,8 +2,9 @@ import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
 import { EffectScope } from "@crowbartools/firebot-custom-scripts-types/types/effects";
 import { logger } from "@oceanity/firebot-helpers/firebot";
 import { getErrorMessage } from "@oceanity/firebot-helpers/string";
-import { writeFile } from "fs-extra";
+import { ensureFile, exists, writeFile } from "fs-extra";
 import { stringify } from "ini";
+import { resolve } from "path";
 import { DEFAULT_INI_FILE_PATH } from "../constants";
 import {
   appendToIniObjectArray,
@@ -147,9 +148,16 @@ export const WriteIniValueEffectType: Firebot.EffectType<WriteIniValueParams> =
           event.effect;
 
         const path =
-          filePathMode === "default" ? DEFAULT_INI_FILE_PATH : filePath;
+          filePathMode === "default"
+            ? DEFAULT_INI_FILE_PATH
+            : resolve(__dirname, "../", filePath);
 
         if (!path) throw new Error("No file path provided.");
+
+        if (!(await exists(path))) {
+          await ensureFile(path);
+          logger.info(`Creating INI file at ${path}`);
+        }
 
         let config = await readAndParseIniFile(path);
 
