@@ -1,4 +1,6 @@
-# Starter Firebot Custom Script in Typescript
+# INI for Firebot
+
+This is a [Firebot](https://github.com/crowbartools/Firebot) Startup Script that adds the ability to read from and write to INI files.
 
 ### Setup
 
@@ -25,7 +27,7 @@ This script adds the following features to Firebot
 
 - **Variables**
 
-  - $iniVariable[`path` (optional), `section`, `key`]
+  - $ini[`path?`, `section`, `key`]
     - Retrieves a value with the provided section and key from the provided INI file, or default if no path is provided
-    - eg. `$iniVariable[mySection, myKey]` will retrieve the value in [mySection] myKey from `firebot.ini`
-    - eg. `$iniVariable[C:/Users/Firebot/Documents/MyINI.ini, mySection, myKey]` will retrieve the value in [mySection] myKey from an INI file located at that path
+    - eg. `$ini[mySection, myKey]` will retrieve the value in [mySection] myKey from `firebot.ini`
+    - eg. `$ini[C:/Users/Firebot/Documents/MyINI.ini, mySection, myKey]` will retrieve the value in [mySection] myKey from an INI file located at that path
