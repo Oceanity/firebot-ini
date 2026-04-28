@@ -14,6 +14,7 @@ import {
   INI_INTEGRATION_DESCRIPTION,
   INI_INTEGRATION_FIREBOT_VERSION,
   INI_INTEGRATION_NAME,
+  INI_INTEGRATION_NAME_AND_AUTHOR,
   INI_INTEGRATION_PACKAGE_URL,
   INI_INTEGRATION_VERSION,
 } from "./constants";
@@ -25,7 +26,7 @@ interface Params {}
 const script: Firebot.CustomScript<Params> = {
   getScriptManifest: () => {
     return {
-      name: INI_INTEGRATION_NAME,
+      name: INI_INTEGRATION_NAME_AND_AUTHOR,
       description: INI_INTEGRATION_DESCRIPTION,
       author: INI_INTEGRATION_AUTHOR,
       version: INI_INTEGRATION_VERSION,
@@ -58,7 +59,7 @@ const script: Firebot.CustomScript<Params> = {
     if (response && response.isRemoteNewer) {
       runRequest.modules.notificationManager.addNotification(
         {
-          title: `New version of ${INI_INTEGRATION_NAME}!`,
+          title: `New version of ${INI_INTEGRATION_NAME_AND_AUTHOR}!`,
           message: `Oceanity has released a new version of the ${INI_INTEGRATION_NAME} (${response.localVersion} -> ${response.remoteVersion}). Go to https://github.com/Oceanity/firebot-ini/releases/latest to download the new version.`,
           type: "update" as NotificationType,
         },
