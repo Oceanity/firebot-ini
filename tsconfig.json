@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
-    "target": "ES6",
-    "module": "CommonJS",
+    "target": "ES2022",
+    "module": "nodenext",
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "experimentalDecorators": true,
-    "downlevelIteration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "useUnknownInCatchVariables": false
   },
   "include": ["./src/**/*"]
 }
