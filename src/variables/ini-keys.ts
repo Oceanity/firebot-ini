@@ -7,18 +7,17 @@ import { basename } from "path";
 import { DEFAULT_INI_FILE_PATH } from "../constants";
 import { readAndParseIniFile } from "../utils/ini-helpers";
 
-export const IniValueReplaceVariable: ReplaceVariable = {
+export const IniKeysReplaceVariable: ReplaceVariable = {
   definition: {
-    handle: "iniValue",
-    aliases: ["ini"],
-    description: "Gets a value from an INI file.",
-    usage: "iniValue[section, key]",
+    handle: "iniKeys",
+    description: "Gets the keys of a section from an INI file.",
+    usage: "iniKeys[section]",
     categories: ["text"],
     possibleDataOutput: ["text"],
     examples: [
       {
-        usage: "iniValue[path/to/file.ini, section, key]",
-        description: "Gets a value from a specified INI file.",
+        usage: "iniKeys[path/to/file.ini, section]",
+        description: "Gets the keys of a section from a specified INI file.",
       },
     ],
   },
@@ -42,7 +41,7 @@ export const IniValueReplaceVariable: ReplaceVariable = {
         throw new Error("No config found at provided path.");
       }
 
-      const [section, key] = params;
+      const [section] = params;
       if (!section) {
         return config;
       }
@@ -52,19 +51,10 @@ export const IniValueReplaceVariable: ReplaceVariable = {
         throw new Error("No section found at provided path.");
       }
 
-      if (!key) {
-        return sectionObject;
-      }
-
-      const value = sectionObject[key];
-      if (!value) {
-        throw new Error("No value found at provided path.");
-      }
-
-      return value;
+      return Object.keys(sectionObject);
     } catch (error) {
       logger.error(getErrorMessage(error), error);
-      return "";
+      return [];
     }
   },
 };

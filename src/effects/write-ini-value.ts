@@ -143,32 +143,42 @@ export const WriteIniValueEffectType: Firebot.EffectType<WriteIniValueParams> =
 
     onTriggerEvent: async (event) => {
       try {
-        let { editMode, filePath, filePathMode, key, section, value } =
+        const { editMode, filePath, filePathMode, key, section, value } =
           event.effect;
 
         const path =
           filePathMode === "default" ? DEFAULT_INI_FILE_PATH : filePath;
-
-        if (!path) throw new Error("No file path provided.");
+        if (!path) {
+          throw new Error("No file path provided.");
+        }
 
         let config = await readAndParseIniFile(path);
 
         const invalidKeyChars = new RegExp("[\\[\\]:=]", "ig");
-        if (key && invalidKeyChars.test(key))
-          key = key.replace(invalidKeyChars, "_");
+        const sanitizedKey = key.replace(invalidKeyChars, "_");
 
         switch (editMode) {
           case "write":
-            config = insertToIniObject(config, section, key, value);
+            config = insertToIniObject(config, section, sanitizedKey, value);
             break;
           case "delete":
-            config = deleteFromIniObject(config, section, key);
+            config = deleteFromIniObject(config, section, sanitizedKey);
             break;
           case "append":
-            config = appendToIniObjectArray(config, section, key, value);
+            config = appendToIniObjectArray(
+              config,
+              section,
+              sanitizedKey,
+              value,
+            );
             break;
           case "remove":
-            config = removeFromIniObjectArray(config, section, key, value);
+            config = removeFromIniObjectArray(
+              config,
+              section,
+              sanitizedKey,
+              value,
+            );
             break;
           default:
             throw new Error("Invalid edit mode.");

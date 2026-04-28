@@ -6,7 +6,7 @@ import { parse } from "ini";
 export const sanitizedKey = (key: string) => key.replace(/[\[\]:=]/g, "_");
 
 export async function readAndParseIniFile(
-  filePath: string
+  filePath: string,
 ): Promise<Record<string, any>> {
   try {
     const text = await readFile(filePath, "utf8");
@@ -14,6 +14,7 @@ export async function readAndParseIniFile(
     return parse(text);
   } catch (error) {
     logger.error(getErrorMessage(error), error);
+    return {};
   }
 }
 
@@ -21,7 +22,7 @@ export function insertToIniObject(
   config: Record<string, any>,
   section: string,
   key: string,
-  value: string
+  value: string,
 ): Record<string, any> {
   let current = walkToSection(config, section, true);
 
@@ -33,7 +34,7 @@ export function insertToIniObject(
 export function deleteFromIniObject(
   config: Record<string, any>,
   section: string,
-  key: string
+  key: string,
 ): Record<string, any> {
   let current = walkToSection(config, section, false);
 
@@ -46,7 +47,7 @@ export function appendToIniObjectArray(
   config: Record<string, any>,
   section: string,
   key: string,
-  value: string
+  value: string,
 ): Record<string, any> {
   let current = walkToSection(config, section, true);
 
@@ -63,7 +64,7 @@ export function removeFromIniObjectArray(
   config: Record<string, any>,
   section: string,
   key: string,
-  value: string
+  value: string,
 ): Record<string, any> {
   let current = walkToSection(config, section, false);
 
@@ -84,7 +85,7 @@ export function removeFromIniObjectArray(
 function walkToSection(
   config: Record<string, any>,
   section: string,
-  createMissing: boolean
+  createMissing: boolean,
 ): Record<string, any> {
   let current = config;
 

@@ -1,10 +1,12 @@
 import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
+import { NotificationType } from "@crowbartools/firebot-custom-scripts-types/types/modules/notification-manager";
 import {
   effectManager,
   initModules,
   logger,
-  variableManager,
+  replaceVariableManager,
 } from "@oceanity/firebot-helpers/firebot";
+import { remoteVersionCheck } from "@oceanity/firebot-helpers/package";
 import { ensureFile, exists } from "fs-extra";
 import {
   DEFAULT_INI_FILE_PATH,
@@ -12,6 +14,7 @@ import {
   INI_INTEGRATION_DESCRIPTION,
   INI_INTEGRATION_FIREBOT_VERSION,
   INI_INTEGRATION_NAME,
+  INI_INTEGRATION_PACKAGE_URL,
   INI_INTEGRATION_VERSION,
 } from "./constants";
 import { AllIniEffectTypes } from "./effects";
@@ -44,7 +47,38 @@ const script: Firebot.CustomScript<Params> = {
     }
 
     for (const variable of AllIniReplaceVariables) {
-      variableManager.registerReplaceVariable(variable);
+      replaceVariableManager.registerReplaceVariable(variable);
+    }
+
+    // Check for updates
+    const response = await remoteVersionCheck(
+      INI_INTEGRATION_VERSION,
+      INI_INTEGRATION_PACKAGE_URL,
+    );
+    if (response && response.isRemoteNewer) {
+      runRequest.modules.notificationManager.addNotification(
+        {
+          title: `New version of ${INI_INTEGRATION_NAME}!`,
+          message: `Oceanity has released a new version of the ${INI_INTEGRATION_NAME} (${response.localVersion} -> ${response.remoteVersion}). Go to https://github.com/Oceanity/firebot-ini/releases/latest to download the new version.`,
+          type: "update" as NotificationType,
+        },
+        false,
+      );
+    }
+  },
+  stop: (uninstalling: boolean) => {
+    for (const effectType of AllIniEffectTypes) {
+      effectManager.unregisterEffect(effectType.definition.id);
+    }
+
+    for (const variable of AllIniReplaceVariables) {
+      replaceVariableManager.unregisterReplaceVariable(
+        variable.definition.handle,
+      );
+    }
+
+    if (uninstalling) {
+      logger.info("Successfully uninstalled Ini Extension!");
     }
   },
 };
