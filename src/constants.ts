@@ -10,7 +10,6 @@ export const {
 
 export const INI_INTEGRATION_NAME_AND_AUTHOR = `${INI_INTEGRATION_NAME} (by ${INI_INTEGRATION_AUTHOR})`;
 export const INI_INTEGRATION_ID = "oceanity:ini";
-export const INI_INTEGRATION_FIREBOT_VERSION = "5";
 export const DEFAULT_INI_FILE_PATH = resolve(__dirname, "../firebot.ini");
 export const INI_INTEGRATION_PACKAGE_URL =
   "https://raw.githubusercontent.com/Oceanity/firebot-ini/refs/heads/main/package.json";

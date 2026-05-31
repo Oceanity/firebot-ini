@@ -1,5 +1,4 @@
-import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
-import { logger } from "@oceanity/firebot-helpers/firebot";
+import firebot, { ReplaceVariable } from "@crowbartools/firebot-types";
 import { objectWalkPath } from "@oceanity/firebot-helpers/object";
 import { getErrorMessage } from "@oceanity/firebot-helpers/string";
 import { access } from "fs";
@@ -9,8 +8,8 @@ import { readAndParseIniFile } from "../utils/ini-helpers";
 
 export const IniValueReplaceVariable: ReplaceVariable = {
   definition: {
-    handle: "iniValue",
-    aliases: ["ini"],
+    handle: "ini",
+    aliases: ["iniValue"],
     description: "Gets a value from an INI file.",
     usage: "iniValue[section, key]",
     categories: ["text"],
@@ -25,11 +24,13 @@ export const IniValueReplaceVariable: ReplaceVariable = {
   evaluator: async (_trigger, ...params) => {
     try {
       const path = (await new Promise((res) => {
-        if (!params.length || params[0] === basename(params[0]))
+        if (!params.length || params[0] === basename(params[0] as string))
           return res(DEFAULT_INI_FILE_PATH);
         try {
-          access(params[0], (error) => {
-            return res(error ? DEFAULT_INI_FILE_PATH : params.shift());
+          access(params[0] as string, (error) => {
+            return res(
+              error ? DEFAULT_INI_FILE_PATH : (params.shift() as string),
+            );
           });
         } catch (error) {
           return res(DEFAULT_INI_FILE_PATH);
@@ -47,7 +48,7 @@ export const IniValueReplaceVariable: ReplaceVariable = {
         return config;
       }
 
-      const sectionObject = objectWalkPath(config, section);
+      const sectionObject = objectWalkPath(config, section as string);
       if (!sectionObject) {
         throw new Error("No section found at provided path.");
       }
@@ -63,7 +64,7 @@ export const IniValueReplaceVariable: ReplaceVariable = {
 
       return value;
     } catch (error) {
-      logger.error(getErrorMessage(error), error);
+      firebot.logger.error(getErrorMessage(error), error);
       return "";
     }
   },

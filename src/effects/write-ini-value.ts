@@ -1,6 +1,4 @@
-import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
-import { EffectScope } from "@crowbartools/firebot-custom-scripts-types/types/effects";
-import { logger } from "@oceanity/firebot-helpers/firebot";
+import firebot, { EffectScope, EffectType } from "@crowbartools/firebot-types";
 import { getErrorMessage } from "@oceanity/firebot-helpers/string";
 import { writeFile } from "fs-extra";
 import { stringify } from "ini";
@@ -13,7 +11,7 @@ import {
   removeFromIniObjectArray,
 } from "../utils/ini-helpers";
 
-type WriteIniValueParams = {
+type EffectModel = {
   editMode: "write" | "delete" | "append" | "remove";
   filePathMode: "default" | "fileSelector" | "filePath";
   filePath?: string;
@@ -22,16 +20,15 @@ type WriteIniValueParams = {
   value: string;
 };
 
-export const WriteIniValueEffectType: Firebot.EffectType<WriteIniValueParams> =
-  {
-    definition: {
-      id: "write-ini-value",
-      name: "Write to INI File",
-      description: "Writes a value to an INI file.",
-      icon: "fad fa-file-edit",
-      categories: ["integrations"],
-    },
-    optionsTemplate: `
+export const WriteIniValueEffectType: EffectType<EffectModel> = {
+  definition: {
+    id: "write-ini-value",
+    name: "Write to INI File",
+    description: "Writes a value to an INI file.",
+    icon: "fad fa-file-edit",
+    categories: ["integrations"],
+  },
+  optionsTemplate: `
       <eos-container header="File Location">
         <div class="form-group">
           <firebot-radio-cards
@@ -82,118 +79,113 @@ export const WriteIniValueEffectType: Firebot.EffectType<WriteIniValueParams> =
           style="margin-bottom: 20px" />
       </eos-container>
     `,
-    optionsController: ($scope: EffectScope<WriteIniValueParams>) => {
-      $scope.pathModeOptions = [
-        {
-          value: "default",
-          label: "Default",
-          description: "Edit a value in the default INI file.",
-          iconClass: "fa-house",
-        },
-        {
-          value: "fileSelector",
-          label: "File Selector",
-          description: "Specify an INI file to edit a value in.",
-          iconClass: "fa-file",
-        },
-      ];
-      if ($scope.effect.filePathMode === undefined) {
-        $scope.effect.filePathMode = "default";
+  optionsController: ($scope: EffectScope<EffectModel>) => {
+    $scope.pathModeOptions = [
+      {
+        value: "default",
+        label: "Default",
+        description: "Edit a value in the default INI file.",
+        iconClass: "fa-house",
+      },
+      {
+        value: "fileSelector",
+        label: "File Selector",
+        description: "Specify an INI file to edit a value in.",
+        iconClass: "fa-file",
+      },
+    ];
+    if ($scope.effect.filePathMode === undefined) {
+      $scope.effect.filePathMode = "default";
+    }
+
+    $scope.editModeOptions = [
+      {
+        value: "write",
+        label: "Write",
+        description: "Write a value to the INI file.",
+        iconClass: "fa-pencil",
+      },
+      {
+        value: "delete",
+        label: "Delete",
+        description: "Delete a value from the INI file.",
+        iconClass: "fa-eraser",
+      },
+      {
+        value: "append",
+        label: "Append to Array",
+        description: "Append a value to an array in the INI file.",
+        iconClass: "fa-plus",
+      },
+      {
+        value: "remove",
+        label: "Remove from Array",
+        description: "Remove a value from an array in the INI file.",
+        iconClass: "fa-minus",
+      },
+    ];
+    if ($scope.effect.editMode === undefined) {
+      $scope.effect.editMode = "write";
+    }
+  },
+
+  optionsValidator: (effect) => {
+    const errors: string[] = [];
+    if (!effect.section) errors.push("Section is required.");
+    if (!effect.key) errors.push("Key is required.");
+    if (effect.editMode != "delete" && !effect.value)
+      errors.push("Value is required.");
+    return errors;
+  },
+
+  onTriggerEvent: async (event) => {
+    try {
+      const { editMode, filePath, filePathMode, key, section, value } =
+        event.effect;
+
+      const path =
+        filePathMode === "default" ? DEFAULT_INI_FILE_PATH : filePath;
+      if (!path) {
+        throw new Error("No file path provided.");
       }
 
-      $scope.editModeOptions = [
-        {
-          value: "write",
-          label: "Write",
-          description: "Write a value to the INI file.",
-          iconClass: "fa-pencil",
-        },
-        {
-          value: "delete",
-          label: "Delete",
-          description: "Delete a value from the INI file.",
-          iconClass: "fa-eraser",
-        },
-        {
-          value: "append",
-          label: "Append to Array",
-          description: "Append a value to an array in the INI file.",
-          iconClass: "fa-plus",
-        },
-        {
-          value: "remove",
-          label: "Remove from Array",
-          description: "Remove a value from an array in the INI file.",
-          iconClass: "fa-minus",
-        },
-      ];
-      if ($scope.effect.editMode === undefined) {
-        $scope.effect.editMode = "write";
+      let config = await readAndParseIniFile(path);
+
+      const invalidKeyChars = new RegExp("[\\[\\]:=]", "ig");
+      const sanitizedKey = key.replace(invalidKeyChars, "_");
+
+      switch (editMode) {
+        case "write":
+          config = insertToIniObject(config, section, sanitizedKey, value);
+          break;
+        case "delete":
+          config = deleteFromIniObject(config, section, sanitizedKey);
+          break;
+        case "append":
+          config = appendToIniObjectArray(config, section, sanitizedKey, value);
+          break;
+        case "remove":
+          config = removeFromIniObjectArray(
+            config,
+            section,
+            sanitizedKey,
+            value,
+          );
+          break;
+        default:
+          throw new Error("Invalid edit mode.");
       }
-    },
 
-    optionsValidator: (effect) => {
-      const errors: string[] = [];
-      if (!effect.section) errors.push("Section is required.");
-      if (!effect.key) errors.push("Key is required.");
-      if (effect.editMode != "delete" && !effect.value)
-        errors.push("Value is required.");
-      return errors;
-    },
+      await writeFile(path, stringify(config));
 
-    onTriggerEvent: async (event) => {
-      try {
-        const { editMode, filePath, filePathMode, key, section, value } =
-          event.effect;
-
-        const path =
-          filePathMode === "default" ? DEFAULT_INI_FILE_PATH : filePath;
-        if (!path) {
-          throw new Error("No file path provided.");
-        }
-
-        let config = await readAndParseIniFile(path);
-
-        const invalidKeyChars = new RegExp("[\\[\\]:=]", "ig");
-        const sanitizedKey = key.replace(invalidKeyChars, "_");
-
-        switch (editMode) {
-          case "write":
-            config = insertToIniObject(config, section, sanitizedKey, value);
-            break;
-          case "delete":
-            config = deleteFromIniObject(config, section, sanitizedKey);
-            break;
-          case "append":
-            config = appendToIniObjectArray(
-              config,
-              section,
-              sanitizedKey,
-              value,
-            );
-            break;
-          case "remove":
-            config = removeFromIniObjectArray(
-              config,
-              section,
-              sanitizedKey,
-              value,
-            );
-            break;
-          default:
-            throw new Error("Invalid edit mode.");
-        }
-
-        await writeFile(path, stringify(config));
-
-        return {
-          success: true,
-        };
-      } catch (error) {
-        logger.error(getErrorMessage(error), error);
-        return {
-          success: false,
-        };
-      }
-    },
-  };
+      return {
+        success: true,
+      };
+    } catch (error) {
+      firebot.logger.error(getErrorMessage(error), error);
+      return {
+        success: false,
+      };
+    }
+  },
+};
