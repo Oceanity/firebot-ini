@@ -1,9 +1,9 @@
 {
   "name": "firebot-ini-by-oceanity",
-  "displayName": "INI",
+  "displayName": "INI Files",
   "pluginOutputName": "oceanityIni",
   "version": "1.4.0",
-  "description": "Firebot plugin that enables reading and writing INI files",
+  "description": "A Firebot Plugin that enables reading from and writing to INI files",
   "main": "",
   "scripts": {
     "build": "tsdown",
