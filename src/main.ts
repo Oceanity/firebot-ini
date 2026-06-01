@@ -16,7 +16,7 @@ const plugin: Plugin = {
     name: INI_PLUGIN_NAME,
     description: INI_PLUGIN_DESCRIPTION,
     icon: "fa-file",
-    color: "#999",
+    color: "linear-gradient(180deg,#0ef,#60e,#f4c)",
     version: INI_PLUGIN_VERSION,
     author: INI_PLUGIN_AUTHOR,
     type: "plugin",
