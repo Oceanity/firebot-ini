@@ -4,6 +4,7 @@ import {
   DEFAULT_INI_FILE_PATH,
   INI_PLUGIN_AUTHOR,
   INI_PLUGIN_DESCRIPTION,
+  INI_PLUGIN_ICON_DATA_URL,
   INI_PLUGIN_NAME,
   INI_PLUGIN_NAME_AND_AUTHOR,
   INI_PLUGIN_VERSION,
@@ -15,8 +16,11 @@ const plugin: Plugin = {
   manifest: {
     name: INI_PLUGIN_NAME,
     description: INI_PLUGIN_DESCRIPTION,
-    icon: "fa-file",
-    color: "linear-gradient(180deg,#0ef,#60e,#f4c)",
+    icon: {
+      type: "custom",
+      url: INI_PLUGIN_ICON_DATA_URL,
+      backgroundColor: "linear-gradient(180deg,#0ef,#60e,#f4c)",
+    },
     version: INI_PLUGIN_VERSION,
     author: INI_PLUGIN_AUTHOR,
     type: "plugin",

@@ -14,7 +14,7 @@
   "author": "Oceanity",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@crowbartools/firebot-types": "^5.67.0-alpha8",
+    "@crowbartools/firebot-types": "^5.67.0-alpha18",
     "@oceanity/firebot-helpers": "^1.1.8",
     "@types/fs-extra": "^11.0.4",
     "@types/ini": "^4.1.1",
