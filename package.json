@@ -2,7 +2,7 @@
   "name": "firebot-ini-by-oceanity",
   "displayName": "INI Files",
   "pluginOutputName": "oceanityIni",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "A Firebot Plugin that enables reading from and writing to INI files",
   "main": "",
   "scripts": {
