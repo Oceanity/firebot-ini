@@ -1,5 +1,5 @@
 import firebot, { Plugin } from "@crowbartools/firebot-types";
-import { remoteVersionCheck } from "@oceanity/firebot-helpers/package";
+import { remoteVersionCheck } from "@oceanity/firebot-helpers/package/remoteVersionCheck";
 import { ensureFile, exists } from "fs-extra";
 import {
   DEFAULT_INI_FILE_PATH,
