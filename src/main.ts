@@ -1,4 +1,5 @@
 import firebot, { Plugin } from "@crowbartools/firebot-types";
+import { remoteVersionCheck } from "@oceanity/firebot-helpers/package";
 import { ensureFile, exists } from "fs-extra";
 import {
   DEFAULT_INI_FILE_PATH,
@@ -7,6 +8,7 @@ import {
   INI_PLUGIN_ICON_DATA_URI,
   INI_PLUGIN_NAME,
   INI_PLUGIN_NAME_AND_AUTHOR,
+  INI_PLUGIN_PACKAGE_URL,
   INI_PLUGIN_VERSION,
 } from "./constants";
 import { AllIniEffectTypes } from "./effects";
@@ -23,7 +25,6 @@ const plugin: Plugin = {
     },
     version: INI_PLUGIN_VERSION,
     author: INI_PLUGIN_AUTHOR,
-    type: "plugin",
   },
   registers: {
     effects: AllIniEffectTypes,
@@ -36,21 +37,20 @@ const plugin: Plugin = {
       firebot.logger.info(`Created file at ${DEFAULT_INI_FILE_PATH}`);
     }
 
-    // TODO: Reimplement when plugins can access notificationManger
-    // const response = await remoteVersionCheck(
-    //   INI_PLUGIN_VERSION,
-    //   INI_PLUGIN_PACKAGE_URL,
-    // );
-    // if (response && response.isRemoteNewer) {
-    //   runRequest.modules.notificationManager.addNotification(
-    //     {
-    //       title: `New version of ${INI_PLUGIN_NAME_AND_AUTHOR}!`,
-    //       message: `Oceanity has released a new version of the ${INI_PLUGIN_NAME} (${response.localVersion} -> ${response.remoteVersion}). Go to https://github.com/Oceanity/firebot-ini/releases/latest to download the new version.`,
-    //       type: "update" as NotificationType,
-    //     },
-    //     false,
-    //   );
-    // }
+    const response = await remoteVersionCheck(
+      INI_PLUGIN_VERSION,
+      INI_PLUGIN_PACKAGE_URL,
+    );
+    if (response && response.isRemoteNewer) {
+      firebot.notifications.add(
+        {
+          title: `New version of ${INI_PLUGIN_NAME_AND_AUTHOR}!`,
+          message: `Oceanity has released a new version of the ${INI_PLUGIN_NAME} (${response.localVersion} -> ${response.remoteVersion}). Go to https://github.com/Oceanity/firebot-ini/releases/latest to download the new version.`,
+          type: "update",
+        },
+        false,
+      );
+    }
 
     firebot.logger.info(`Loaded Plugin ${INI_PLUGIN_NAME_AND_AUTHOR}`);
   },

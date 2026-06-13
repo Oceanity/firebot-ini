@@ -1,5 +1,4 @@
 import firebot, { EffectScope, EffectType } from "@crowbartools/firebot-types";
-import { getErrorMessage } from "@oceanity/firebot-helpers/string";
 import { writeFile } from "fs-extra";
 import { stringify } from "ini";
 import { DEFAULT_INI_FILE_PATH } from "../constants";
@@ -182,7 +181,7 @@ export const WriteIniValueEffectType: EffectType<EffectModel> = {
         success: true,
       };
     } catch (error) {
-      firebot.logger.error(getErrorMessage(error), error);
+      firebot.logger.error("Error writing Ini value", error);
       return {
         success: false,
       };

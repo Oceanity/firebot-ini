@@ -1,5 +1,4 @@
 import firebot from "@crowbartools/firebot-types";
-import { getErrorMessage } from "@oceanity/firebot-helpers/string";
 import { readFile } from "fs-extra";
 import { parse } from "ini";
 
@@ -13,7 +12,7 @@ export async function readAndParseIniFile(
 
     return parse(text);
   } catch (error) {
-    firebot.logger.error(getErrorMessage(error), error);
+    firebot.logger.error("Error reading Ini file", error);
     return {};
   }
 }

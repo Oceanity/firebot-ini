@@ -1,6 +1,5 @@
 import firebot, { ReplaceVariable } from "@crowbartools/firebot-types";
 import { objectWalkPath } from "@oceanity/firebot-helpers/object";
-import { getErrorMessage } from "@oceanity/firebot-helpers/string";
 import { access } from "fs";
 import { basename } from "path";
 import { DEFAULT_INI_FILE_PATH } from "../constants";
@@ -54,7 +53,7 @@ export const IniKeysReplaceVariable: ReplaceVariable = {
 
       return Object.keys(sectionObject);
     } catch (error) {
-      firebot.logger.error(getErrorMessage(error), error);
+      firebot.logger.error("Error reading Ini value", error);
       return [];
     }
   },
