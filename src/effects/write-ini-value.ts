@@ -127,16 +127,42 @@ export const WriteIniValueEffectType: EffectType<EffectModel> = {
       $scope.effect.editMode = "write";
     }
   },
-
   optionsValidator: (effect) => {
     const errors: string[] = [];
-    if (!effect.section) errors.push("Section is required.");
-    if (!effect.key) errors.push("Key is required.");
-    if (effect.editMode != "delete" && !effect.value)
+    if (effect.section === undefined || !effect.section.length) {
+      errors.push("Section is required.");
+    }
+    if (!effect.key === undefined || !effect.key.length) {
+      errors.push("Key is required.");
+    }
+    if (effect.editMode !== "delete" && !effect.value) {
       errors.push("Value is required.");
+    }
     return errors;
   },
-
+  getDefaultLabel: (effect) => {
+    let base = "Writing Key '{key}' to";
+    switch (effect.editMode) {
+      case "append":
+        base = "Appending to Array '{key}' in";
+        break;
+      case "delete":
+        base = "Deleting Key '{key}' from";
+        break;
+      case "remove":
+        base = "Removing from Array '{key}' in";
+        break;
+    }
+    const file =
+      effect.filePath !== undefined && !!effect.filePath.length
+        ? effect.filePath.split(/[\\/]/).pop()
+        : "Default Ini File";
+    const valueString =
+      effect.value !== undefined && !!effect.value.length
+        ? `, value: ${effect.value}`
+        : "";
+    return `${base.replace("{key}", effect.key)} Section '${effect.section}' in ${file}${valueString}`;
+  },
   onTriggerEvent: async (event) => {
     try {
       const { editMode, filePath, filePathMode, key, section, value } =
