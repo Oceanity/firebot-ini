@@ -25,6 +25,7 @@ const plugin: Plugin = {
     },
     version: INI_PLUGIN_VERSION,
     author: INI_PLUGIN_AUTHOR,
+    repo: "https://github.com/Oceanity/firebot-ini",
   },
   registers: {
     effects: AllIniEffectTypes,
