@@ -1,14 +1,13 @@
 import firebot, { Plugin } from "@crowbartools/firebot-types";
-import { remoteVersionCheck } from "@oceanity/firebot-helpers/package/remoteVersionCheck";
 import { ensureFile, exists } from "fs-extra";
 import {
   DEFAULT_INI_FILE_PATH,
   INI_PLUGIN_AUTHOR,
   INI_PLUGIN_DESCRIPTION,
+  INI_PLUGIN_ICON_BACKGROUND,
   INI_PLUGIN_ICON_DATA_URI,
   INI_PLUGIN_NAME,
-  INI_PLUGIN_NAME_AND_AUTHOR,
-  INI_PLUGIN_PACKAGE_URL,
+  INI_PLUGIN_REPO_URL,
   INI_PLUGIN_VERSION,
 } from "./constants";
 import { AllIniEffectTypes } from "./effects";
@@ -21,11 +20,11 @@ const plugin: Plugin = {
     icon: {
       type: "custom",
       url: INI_PLUGIN_ICON_DATA_URI,
-      backgroundColor: "linear-gradient(180deg,#0ef,#60e,#f4c)",
+      backgroundColor: INI_PLUGIN_ICON_BACKGROUND,
     },
     version: INI_PLUGIN_VERSION,
     author: INI_PLUGIN_AUTHOR,
-    repo: "https://github.com/Oceanity/firebot-ini",
+    repo: INI_PLUGIN_REPO_URL,
   },
   registers: {
     effects: AllIniEffectTypes,
@@ -37,23 +36,6 @@ const plugin: Plugin = {
       await ensureFile(DEFAULT_INI_FILE_PATH);
       firebot.logger.info(`Created file at ${DEFAULT_INI_FILE_PATH}`);
     }
-
-    const response = await remoteVersionCheck(
-      INI_PLUGIN_VERSION,
-      INI_PLUGIN_PACKAGE_URL,
-    );
-    if (response && response.isRemoteNewer) {
-      firebot.notifications.add(
-        {
-          title: `New version of ${INI_PLUGIN_NAME_AND_AUTHOR}!`,
-          message: `Oceanity has released a new version of the ${INI_PLUGIN_NAME} (${response.localVersion} -> ${response.remoteVersion}). Go to https://github.com/Oceanity/firebot-ini/releases/latest to download the new version.`,
-          type: "update",
-        },
-        false,
-      );
-    }
-
-    firebot.logger.info(`Loaded Plugin ${INI_PLUGIN_NAME_AND_AUTHOR}`);
   },
 };
 
