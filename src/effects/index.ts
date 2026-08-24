@@ -1,3 +1,6 @@
+import { EffectType } from "@crowbartools/firebot-types";
 import { WriteIniValueEffectType } from "./write-ini-value";
 
-export const AllIniEffectTypes = [WriteIniValueEffectType];
+export const AllIniEffectTypes: Array<EffectType<any>> = [
+  WriteIniValueEffectType,
+];
