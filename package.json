@@ -14,17 +14,17 @@
   "author": "Oceanity",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@crowbartools/firebot-types": "^5.67.0-alpha30",
+    "@crowbartools/firebot-types": "^5.67.0-beta1",
     "@oceanity/firebot-helpers": "^1.1.8",
     "@types/fs-extra": "^11.0.4",
     "@types/ini": "^4.1.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.20.1",
-    "fs-extra": "^11.3.6",
+    "fs-extra": "^11.4.0",
     "ini": "^7.0.0",
     "jest": "^30.4.2",
-    "ts-jest": "^29.4.11",
-    "tsdown": "^0.22.9",
+    "ts-jest": "^29.4.12",
+    "tsdown": "^0.22.14",
     "typescript": "^5.9.3"
   },
   "volta": {
